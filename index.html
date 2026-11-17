@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ismo.flort.com.tr</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
+body{background:#0f0f14;color:#fff;min-height:100vh}
+button,input,select,textarea{font:inherit}
+.top{position:sticky;top:0;z-index:50;background:rgba(15,15,20,.92);backdrop-filter:blur(12px);border-bottom:1px solid #2a2a35;padding:14px 5%;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.site{font-size:22px;font-weight:950;color:#fff;text-decoration:none}.site span{color:#ff4d8d}
+.user-chip{color:#f9a8d4;font-weight:800;font-size:14px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tab{border:1px solid #343442;background:#1a1a23;color:#fff;padding:10px 18px;border-radius:999px;cursor:pointer;font-weight:800}
+.tab.active{background:#ff4d8d;border-color:#ff4d8d}
+main{max-width:1150px;margin:0 auto;padding:42px 20px 70px}
+.page{display:none}.page.active{display:block}
+h1{font-size:clamp(32px,6vw,58px);letter-spacing:-1.5px;margin-bottom:10px}
+.sub{color:#a1a1aa;margin-bottom:28px}
+.upload{background:#17171f;border:2px dashed #4b4b5e;border-radius:26px;padding:42px 22px;text-align:center;cursor:pointer;transition:.2s}
+.upload:hover,.upload.over{border-color:#ff4d8d;background:#1e1620}
+.upload .icon{font-size:58px}.upload h2{font-size:26px;margin:12px 0 8px}.upload p{color:#a1a1aa}
+.name-row{display:flex;gap:10px;max-width:650px;margin:22px auto 0}
+.name-row input{flex:1;background:#101016;border:1px solid #343442;border-radius:14px;color:#fff;padding:14px 16px;outline:none}
+.name-row input:focus{border-color:#ff4d8d}
+.add-btn{margin-top:22px;background:#ff4d8d;color:#fff;border:0;padding:14px 28px;border-radius:999px;font-weight:950;cursor:pointer;font-size:16px}
+.status{display:none;margin-top:20px;background:#221722;border:1px solid #ff4d8d;color:#ffd7e7;padding:14px 18px;border-radius:14px}
+.error{display:none;margin-top:20px;background:#3a1116;border:1px solid #ef4444;color:#fecaca;padding:14px 18px;border-radius:14px;white-space:pre-line;text-align:left}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
+.card{position:relative;background:#17171f;border:1px solid #2a2a35;border-radius:20px;overflow:hidden;cursor:pointer;transition:.2s}
+.card:hover{transform:translateY(-4px);border-color:#ff4d8d}
+.card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#000}
+.card .name{padding:13px 15px 4px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .uploader{padding:0 15px 13px;color:#a1a1aa;font-size:13px}
+.featured-badge{position:absolute;top:10px;left:10px;z-index:3;background:#facc15;color:#111;padding:6px 11px;border-radius:999px;font-size:12px;font-weight:950}
+.admin-actions{position:absolute;top:8px;right:8px;z-index:4;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.admin-actions button{border:0;padding:8px 11px;border-radius:999px;font-size:12px;font-weight:950;cursor:pointer;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.4)}
+.btn-remove{background:#ef4444}.btn-showcase{background:#eab308;color:#111!important}.btn-ban{background:#111;border:1px solid #ef4444!important}
+.empty{color:#71717a;text-align:center;padding:55px 20px;border:1px dashed #343442;border-radius:20px}
+.zoom{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.94);display:none;align-items:center;justify-content:center;padding:22px}
+.zoom.open{display:flex}.zoom-box{max-width:950px;width:100%;text-align:center}
+.zoom img{max-width:100%;max-height:76vh;object-fit:contain;border-radius:16px}
+.zoom-name{font-size:22px;font-weight:900;margin:18px 0 14px}
+.zoom-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.copy{background:#ff4d8d;color:#fff;border:0;padding:13px 24px;border-radius:999px;font-weight:950;cursor:pointer}
+.close{background:#fff;color:#111;border:0;padding:13px 24px;border-radius:999px;font-weight:950;cursor:pointer}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(120px);background:#fff;color:#111;padding:13px 22px;border-radius:999px;font-weight:900;z-index:700;transition:.3s;max-width:90vw;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.admin-btn{position:fixed;left:20px;bottom:20px;z-index:500;width:60px;height:60px;border-radius:50%;border:2px solid #343442;background:#17171f;font-size:30px;cursor:pointer;box-shadow:0 12px 30px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center}
+.admin-btn:hover{border-color:#ff4d8d;transform:scale(1.06)}
+.modal{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;padding:20px}
+.modal.open{display:flex}
+.modal-box{background:#17171f;border:1px solid #343442;border-radius:24px;padding:28px;width:100%;max-width:430px}
+.modal-box.wide{max-width:820px;max-height:86vh;overflow:auto}
+.modal-box h2{font-size:26px;margin-bottom:18px}
+.modal-box input,.modal-box select{width:100%;background:#101016;border:1px solid #343442;border-radius:14px;color:#fff;padding:14px 16px;outline:none;margin-bottom:12px}
+.modal-box input:disabled,.modal-box select:disabled{opacity:.35;cursor:not-allowed}
+.modal-box input:focus,.modal-box select:focus{border-color:#ff4d8d}
+.login-error{display:none;color:#fca5a5;background:#3a1116;border:1px solid #ef4444;padding:11px 14px;border-radius:12px;margin-bottom:12px;white-space:pre-line}
+.ban-row{display:flex;align-items:center;gap:14px;background:#101016;border:1px solid #2a2a35;border-radius:16px;padding:14px;margin-bottom:10px;flex-wrap:wrap}
+.ban-info{flex:1;min-width:220px}.ban-info b{font-size:17px}.ban-info span{display:block;color:#a1a1aa;font-size:13px;margin-top:4px;line-height:1.5}
+.remove-btn,.unban-btn{background:#ef4444;color:#fff;border:0;padding:10px 16px;border-radius:999px;font-weight:900;cursor:pointer;flex-shrink:0}
+.unban-btn{background:#22c55e}
+.removed-icon{font-size:64px;text-align:center}.removed-box{text-align:center}.removed-box p{color:#a1a1aa;margin-bottom:20px}
+.option-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.option-btn{background:#101016;color:#fff;border:1px solid #343442;padding:15px;border-radius:15px;font-weight:900;cursor:pointer}
+.option-btn:hover{border-color:#eab308;background:#221d08}
+.perm-btn{width:100%;background:#101016;color:#fff;border:1px solid #343442;padding:14px;border-radius:14px;font-weight:950;cursor:pointer;margin-bottom:12px}
+.perm-btn.selected{background:#ef4444;border-color:#ef4444}
+.duration-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.vitrin-wrap{margin-bottom:52px}.vitrin-wrap h1{font-size:clamp(28px,5vw,44px)}
+/* GİRİŞ ZORUNLULUĞU */
+.auth-gate{position:fixed;inset:0;z-index:300;background:linear-gradient(135deg,#0f0f14,#22101d);display:none;align-items:center;justify-content:center;padding:20px}
+.auth-gate.open{display:flex}
+.auth-box{background:#17171f;border:1px solid #343442;border-radius:26px;padding:32px;width:100%;max-width:420px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.auth-box h1{font-size:32px;text-align:center}.auth-box .sub{text-align:center;margin-bottom:20px}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
+.auth-tabs button{background:#101016;color:#fff;border:1px solid #343442;padding:12px;border-radius:13px;font-weight:950;cursor:pointer}
+.auth-tabs button.active{background:#ff4d8d;border-color:#ff4d8d}
+.auth-box input{width:100%;background:#101016;border:1px solid #343442;border-radius:14px;color:#fff;padding:14px 16px;outline:none;margin-bottom:12px}
+.auth-submit{width:100%;background:#ff4d8d;color:#fff;border:0;padding:15px;border-radius:999px;font-weight:950;cursor:pointer}
+.ban-screen{position:fixed;inset:0;z-index:350;background:#160709;display:none;align-items:center;justify-content:center;padding:20px;text-align:center}
+.ban-screen.open{display:flex}.ban-screen h1{font-size:clamp(42px,9vw,84px);color:#ef4444}
+.ban-screen p{color:#fca5a5;margin-top:14px;line-height:1.7;white-space:pre-line}
+@media(max-width:640px){.top{justify-content:center}.name-row{flex-direction:column}.option-grid,.duration-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <a class="site" href="#/">ismo<span>.flort.com.tr</span></a>
+  <nav class="tabs">
+    <button class="tab" data-go="home">Ana Page</button>
+    <button class="tab" data-go="gif">ismo gif:</button>
+    <button class="tab" data-go="photo">ismo photo:</button>
+    <span class="user-chip" id="userChip"></span>
+  </nav>
+</header>
+
+<main>
+  <section class="page" id="page-home">
+    <div class="vitrin-wrap" id="vitrinWrap" style="display:none">
+      <h1>⭐ Vitrin</h1>
+      <p class="sub"></p>
+      <div class="grid" id="vitrinGrid"></div>
+    </div>
+
+    <h1>Dosya Yükle</h1>
+    <p class="sub">Dosya ekle: tıkla, sürükleyip bırak veya Ctrl+V ile yapıştır.</p>
+    <div class="upload" id="dropZone">
+      <div class="icon">📁</div>
+      <h2>Dosyaları buraya bırak</h2>
+      <p>Fotoğraf, GIF veya video seç</p>
+      <div class="name-row" onclick="event.stopPropagation()">
+        <input id="nameInput" type="text" placeholder="İsim yaz (örn: ismo gülüyor)">
+      </div>
+      <button class="add-btn" id="addBtn">Dosya Ekle</button>
+    </div>
+    <input type="file" id="fileInput" accept="image/*,video/*" multiple hidden>
+    <div class="status" id="status"></div>
+    <div class="error" id="errorBox"></div>
+  </section>
+
+  <section class="page" id="page-gif">
+    <h1>ismo gif:</h1>
+    <p class="sub">GIF'e tıklayınca büyür.</p>
+    <div class="grid" id="gifGrid"></div>
+    <div class="empty" id="gifEmpty">Henüz GIF yok.</div>
+  </section>
+
+  <section class="page" id="page-photo">
+    <h1>ismo photo:</h1>
+    <p class="sub">Fotoğrafa tıklayınca yaklaşır.</p>
+    <div class="grid" id="photoGrid"></div>
+    <div class="empty" id="photoEmpty">Henüz fotoğraf yok.</div>
+  </section>
+</main>
+
+<!-- GİRİŞ / KAYIT (ZORUNLU) -->
+<div class="auth-gate" id="authGate">
+  <div class="auth-box">
+    <h1>ismo<span style="color:#ff4d8d">.flort.com.tr</span></h1>
+    <p class="sub">Devam etmek için giriş yap.</p>
+    <div class="auth-tabs">
+      <button id="tabLogin" class="active">Log In</button>
+      <button id="tabSignup">Sign Up</button>
+    </div>
+    <div class="login-error" id="authError"></div>
+    <input id="authName" type="text" placeholder="İsim" autocomplete="username">
+    <input id="authPass" type="password" placeholder="Şifre" autocomplete="current-password">
+    <button class="auth-submit" id="authSubmit">Log In</button>
+  </div>
+</div>
+
+<!-- BAN EKRANI -->
+<div class="ban-screen" id="banScreen">
+  <div>
+    <h1>You got ban!</h1>
+    <p id="banDetails"></p>
+  </div>
+</div>
+
+<div class="zoom" id="zoom">
+  <div class="zoom-box">
+    <img id="zoomImg" alt="">
+    <div class="zoom-name" id="zoomName"></div>
+    <div class="zoom-btns">
+      <button class="copy" id="copyBtn">🔗 URL'sini Kopyala</button>
+      <button class="close" id="closeBtn">Kapat</button>
+    </div>
+  </div>
+</div>
+
+<button class="admin-btn" id="adminBtn" title="Admin Panel">😎</button>
+
+<div class="modal" id="loginModal">
+  <div class="modal-box">
+    <h2>😎 Admin Giriş</h2>
+    <div class="login-error" id="loginError">İsim veya şifre yanlış</div>
+    <input id="adminName" type="text" placeholder="İsim" autocomplete="username">
+    <input id="adminPass" type="password" placeholder="Şifre" autocomplete="current-password">
+    <div class="zoom-btns">
+      <button class="copy" id="loginBtn">Giriş Yap</button>
+      <button class="close" id="loginCancel">Vazgeç</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="adminPanel">
+  <div class="modal-box wide">
+    <h2>😎 Admin Panel — Banlananlar</h2>
+    <div id="banList"></div>
+    <div class="empty" id="banEmpty">Banlanan kullanıcı yok.</div>
+    <div class="zoom-btns" style="margin-top:18px">
+      <button class="close" id="adminClose">Kapat</button>
+    </div>
+  </div>
+</div>
+
+<!-- VİTRİN SÜRESİ -->
+<div class="modal" id="showcaseModal">
+  <div class="modal-box">
+    <h2>⭐ Vitrine Koy</h2>
+    <div class="option-grid">
+      <button class="option-btn" data-showcase="1d">1 Gün</button>
+      <button class="option-btn" data-showcase="7d">1 Hafta</button>
+      <button class="option-btn" data-showcase="30d">1 Ay</button>
+      <button class="option-btn" data-showcase="forever">Sonsuza Dek</button>
+    </div>
+    <div class="zoom-btns">
+      <button class="close" id="showcaseRemove" style="display:none">Vitrinden Kaldır</button>
+      <button class="close" id="showcaseCancel">Vazgeç</button>
+    </div>
+  </div>
+</div>
+
+<!-- KULLANICI BANLA -->
+<div class="modal" id="banModal">
+  <div class="modal-box">
+    <h2>🚫 Kullanıcıyı Banla</h2>
+    <div class="login-error" id="banTarget" style="display:block;background:#101016;border-color:#343442;color:#fff"></div>
+    <input id="banReason" type="text" placeholder="Reason (sebep)">
+    <div class="duration-row">
+      <input id="banAmount" type="number" min="1" value="1" placeholder="Sayı (örn: 34)">
+      <select id="banUnit">
+        <option value="minute">Dakika</option>
+        <option value="hour">Saat</option>
+        <option value="day" selected>Gün</option>
+        <option value="month">Ay</option>
+        <option value="year">Yıl</option>
+      </select>
+    </div>
+    <button class="perm-btn" id="permBtn" type="button">PERM</button>
+    <div class="zoom-btns">
+      <button class="copy" id="banConfirm" style="background:#ef4444">Banla</button>
+      <button class="close" id="banCancel">Vazgeç</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="removedModal">
+  <div class="modal-box removed-box">
+    <div class="removed-icon">🚫</div>
+    <h2>Kaldırıldı</h2>
+    <p>Bu içerik kaldırıldı.</p>
+    <button class="copy" id="removedHome">Ana Page</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="gif.js"></script>
+<script>
+const MAX_VIDEO_SECONDS = 10;
+const DAY = 24*60*60*1000;
+const UNIT_MS = {minute:60*1000, hour:60*60*1000, day:DAY, month:30*DAY, year:365*DAY};
+const UNIT_LABEL = {minute:'dakika', hour:'saat', day:'gün', month:'ay', year:'yıl'};
+const $ = id => document.getElementById(id);
+const fileInput=$('fileInput'), dropZone=$('dropZone'), nameInput=$('nameInput'), toast=$('toast');
+let items=[], objectUrls=new Map(), currentItem=null;
+let showcaseTarget=null, banTargetItem=null, permSelected=false;
+
+/* ---------- Cihaz kimliği (VPN değişse bile bu cihazda kalır) ---------- */
+function cookieGet(k){ const m=document.cookie.match(new RegExp('(?:^|; )'+k+'=([^;]*)')); return m?decodeURIComponent(m[1]):''; }
+function cookieSet(k,v){ document.cookie=`${k}=${encodeURIComponent(v)};max-age=31536000;path=/;SameSite=Lax`; }
+let deviceId = localStorage.getItem('ismo-device-id') || cookieGet('ismo_device') || '';
+if(!deviceId) deviceId = 'dev-'+Math.random().toString(36).slice(2)+Date.now().toString(36);
+localStorage.setItem('ismo-device-id',deviceId); cookieSet('ismo_device',deviceId);
+
+/* ---------- Yardımcılar ---------- */
+function showToast(msg){ toast.textContent=msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),2400); }
+function showError(msg){ $('errorBox').style.display='block'; $('errorBox').textContent=msg; }
+function setStatus(msg){ $('status').style.display=msg?'block':'none'; if(msg)$('status').textContent=msg; }
+async function hashText(t){
+  if(crypto.subtle){ const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
+  let h=0; for(let i=0;i<t.length;i++) h=(h*31 + t.charCodeAt(i))|0; return 'h'+h;
+}
+
+/* ---------- Hesap (cihazda sadece 1 hesap) ---------- */
+const getAccount=()=>{ try{return JSON.parse(localStorage.getItem('ismo-account')||'null')}catch{return null} };
+const getCurrent=()=>{ try{return JSON.parse(localStorage.getItem('ismo-current-user')||'null')}catch{return null} };
+
+/* ---------- Ban kayıtları ---------- */
+const getBans=()=>{ try{return JSON.parse(localStorage.getItem('ismo-bans')||'[]')}catch{return[]} };
+const setBans=b=>localStorage.setItem('ismo-bans',JSON.stringify(b));
+function activeBans(){ const now=Date.now(); const b=getBans().filter(x=>x.perm||x.expiresAt>now); setBans(b); return b; }
+function findBan(username){
+  const u=(username||'').toLocaleLowerCase('tr');
+  return activeBans().find(b=> b.usernameLower===u || (b.deviceId && b.deviceId===deviceId));
+}
+function remainingText(b){
+  if(b.perm) return 'Sonsuza dek (PERM)';
+  let ms=Math.max(0,b.expiresAt-Date.now());
+  const pairs=[[365*DAY,'yıl'],[30*DAY,'ay'],[DAY,'gün'],[60*60*1000,'saat'],[60*1000,'dakika']];
+  for(const [v,l] of pairs) if(ms>=v) return Math.ceil(ms/v)+' '+l+' kaldı';
+  return '1 dakikadan az kaldı';
+}
+function showBanScreen(b){
+  $('authGate').classList.remove('open');
+  $('banDetails').textContent =
+    `Kullanıcı: ${b.username}\nSüre: ${b.durationText}\nKalan: ${remainingText(b)}` + (b.reason?`\nReason: ${b.reason}`:'');
+  $('banScreen').classList.add('open');
+}
+function checkBan(username){
+  const b=findBan(username ?? (getCurrent()?.name||''));
+  if(b){ showBanScreen(b); return b; }
+  $('banScreen').classList.remove('open'); return null;
+}
+
+/* ---------- IndexedDB ---------- */
+function openDB(){ return new Promise((res,rej)=>{ const r=indexedDB.open('ismo-flort-sitesi',1); r.onupgradeneeded=()=>r.result.createObjectStore('files',{keyPath:'id'}); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+async function dbPut(item){ const db=await openDB(); return new Promise((res,rej)=>{ const tx=db.transaction('files','readwrite'); tx.objectStore('files').put(item); tx.oncomplete=res; tx.onerror=()=>rej(tx.error); }); }
+async function dbGetAll(){ const db=await openDB(); return new Promise((res,rej)=>{ const q=db.transaction('files').objectStore('files').getAll(); q.onsuccess=()=>res(q.result||[]); q.onerror=()=>rej(q.error); }); }
+async function dbDelete(id){ const db=await openDB(); return new Promise((res,rej)=>{ const tx=db.transaction('files','readwrite'); tx.objectStore('files').delete(id); tx.oncomplete=res; tx.onerror=()=>rej(tx.error); }); }
+
+/* ---------- Sayfa geçişleri ---------- */
+function goPage(p){ location.hash='#/' + (p==='home'?'':p); }
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>goPage(b.dataset.go)));
+document.querySelector('.site').addEventListener('click',e=>{e.preventDefault();goPage('home');});
+function parseRoute(){
+  const parts=location.hash.replace(/^#\/?/,'').split('/').filter(Boolean);
+  let page='home'; if(parts[0]==='gif'||parts[0]==='photo') page=parts[0];
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  $('page-'+page).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.go===page));
+  if((parts[0]==='gif'||parts[0]==='photo')&&parts[1]){
+    const item=items.find(i=>i.id===parts[1]);
+    if(item){ $('removedModal').classList.remove('open'); openZoom(item,false); }
+    else { zoom.classList.remove('open'); $('removedModal').classList.add('open'); }
+  }
+}
+window.addEventListener('hashchange',parseRoute);
+
+/* ---------- Vitrin ---------- */
+const isFeatured=i=> !!i.featured && (i.featuredUntil==='forever' || i.featuredUntil>Date.now());
+async function cleanExpiredFeatured(){
+  for(const i of items) if(i.featured && i.featuredUntil!=='forever' && i.featuredUntil<=Date.now()){ i.featured=false; delete i.featuredUntil; dbPut(i); }
+}
+
+/* ---------- Listeleme ---------- */
+function urlFor(item){ if(!objectUrls.has(item.id)) objectUrls.set(item.id,URL.createObjectURL(item.blob)); return objectUrls.get(item.id); }
+function makeCard(item){
+  const card=document.createElement('div'); card.className='card';
+  card.innerHTML=`<img src="${urlFor(item)}" alt=""><div class="name"></div><div class="uploader"></div>`;
+  card.querySelector('.name').textContent=item.name;
+  card.querySelector('.uploader').textContent='Paylaşan: '+(item.uploader||'bilinmiyor');
+  if(isFeatured(item)){ const b=document.createElement('span'); b.className='featured-badge'; b.textContent='⭐ Vitrinde'; card.appendChild(b); }
+  if(isAdmin){
+    const acts=document.createElement('div'); acts.className='admin-actions';
+    const mk=(cls,txt,fn)=>{ const b=document.createElement('button'); b.className=cls; b.textContent=txt; b.onclick=e=>{e.stopPropagation();fn();}; return b; };
+    acts.appendChild(mk('btn-remove','Kaldır',()=>removeItem(item)));
+    acts.appendChild(mk('btn-showcase','⭐ Vitrine Koy',()=>{ showcaseTarget=item; $('showcaseRemove').style.display=isFeatured(item)?'':'none'; $('showcaseModal').classList.add('open'); }));
+    acts.appendChild(mk('btn-ban','🚫 Banla',()=>openBan(item)));
+    card.appendChild(acts);
+  }
+  card.onclick=()=>openZoom(item,true);
+  return card;
+}
+async function render(){
+  await cleanExpiredFeatured();
+  const gg=$('gifGrid'), pg=$('photoGrid'), vg=$('vitrinGrid');
+  gg.innerHTML=''; pg.innerHTML=''; vg.innerHTML='';
+  const sorted=[...items].sort((a,b)=>b.created-a.created);
+  sorted.forEach(i=> (i.kind==='gif'?gg:pg).appendChild(makeCard(i)));
+  const feat=sorted.filter(isFeatured);
+  feat.forEach(i=>vg.appendChild(makeCard(i)));
+  $('vitrinWrap').style.display=feat.length?'':'none';
+  $('gifEmpty').style.display=items.some(i=>i.kind==='gif')?'none':'block';
+  $('photoEmpty').style.display=items.some(i=>i.kind==='photo')?'none':'block';
+}
+
+/* ---------- Yakınlaştırma + URL ---------- */
+const zoom=$('zoom');
+const itemUrl=i=>`${location.origin}${location.pathname}#/${i.kind}/${i.id}`;
+function openZoom(item,update){ currentItem=item; $('zoomImg').src=urlFor(item); $('zoomName').textContent=item.name; zoom.classList.add('open'); if(update) history.replaceState(null,'',`#/${item.kind}/${item.id}`); }
+function closeZoom(){ zoom.classList.remove('open'); if(currentItem) history.replaceState(null,'',`#/${currentItem.kind}`); currentItem=null; }
+$('closeBtn').onclick=closeZoom;
+zoom.addEventListener('click',e=>{ if(e.target===zoom) closeZoom(); });
+$('copyBtn').onclick=async()=>{ if(!currentItem)return; const u=itemUrl(currentItem); try{await navigator.clipboard.writeText(u);}catch{ const ta=document.createElement('textarea'); ta.value=u; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); } showToast('URL kopyalandı 🔗'); };
+
+/* ---------- Dosya ekleme ---------- */
+async function saveItem(name,blob,kind){
+  const cur=getCurrent();
+  const item={id:Math.random().toString(36).slice(2,9)+Date.now().toString(36), name, blob, kind, created:Date.now(), uploader:cur?cur.name:'bilinmiyor', uploaderDeviceId:deviceId};
+  await dbPut(item); items.push(item); await render(); return item;
+}
+function cleanName(file,idx,total){ const t=nameInput.value.trim(); if(t) return total>1?`${t} ${idx+1}`:t; return file.name.replace(/\.[^.]+$/,'')||'ismo'; }
+async function handleFiles(list){
+  const cur=getCurrent();
+  if(!cur){ $('authGate').classList.add('open'); return; }
+  if(checkBan(cur.name)) return;
+  const files=[...list]; if(!files.length) return;
+  $('errorBox').style.display='none';
+  for(let i=0;i<files.length;i++){
+    const f=files[i], name=cleanName(f,i,files.length);
+    try{
+      if(f.type==='image/gif'){ await saveItem(name,f,'gif'); showToast('GIF eklendi ✅'); }
+      else if(f.type.startsWith('image/')){ await saveItem(name,f,'photo'); showToast('Fotoğraf eklendi ✅'); }
+      else if(f.type.startsWith('video/')){ await videoToGif(f,name); }
+      else showError(`${f.name}: Desteklenmeyen dosya`);
+    }catch(e){ console.error(e); showError(`${f.name}: Bir hata oldu`); }
+  }
+}
+function videoToGif(file,name){
+  return new Promise(resolve=>{
+    const url=URL.createObjectURL(file), video=document.createElement('video');
+    video.muted=true; video.src=url;
+    video.onloadedmetadata=async()=>{
+      if(!isFinite(video.duration)||video.duration>MAX_VIDEO_SECONDS){ URL.revokeObjectURL(url); setStatus(''); showError('Gif olamayacak kadar uzun'); return resolve(); }
+      try{
+        setStatus(`GIF yapılıyor: ${name}...`);
+        const scale=Math.min(1,480/(video.videoWidth||480));
+        const w=Math.max(2,Math.round((video.videoWidth||480)*scale)), h=Math.max(2,Math.round((video.videoHeight||320)*scale));
+        const canvas=document.createElement('canvas'); canvas.width=w; canvas.height=h;
+        const ctx=canvas.getContext('2d');
+        const gif=new GIF({workers:2,quality:10,width:w,height:h,workerScript:'gif.worker.js'});
+        const fps=10,total=Math.max(1,Math.floor(video.duration*fps));
+        for(let fr=0;fr<total;fr++){
+          await new Promise(r=>{ video.currentTime=fr/fps; video.onseeked=()=>{ ctx.drawImage(video,0,0,w,h); gif.addFrame(ctx,{copy:true,delay:100}); r(); }; });
+          setStatus(`GIF yapılıyor: ${name}... %${Math.round(((fr+1)/total)*100)}`);
+        }
+        gif.on('finished',async blob=>{ URL.revokeObjectURL(url); setStatus(''); await saveItem(name,blob,'gif'); showToast('Video GIF oldu ✅'); resolve(); });
+        gif.render();
+      }catch(e){ console.error(e); URL.revokeObjectURL(url); setStatus(''); showError(`${file.name}: GIF yapılamadı`); resolve(); }
+    };
+    video.onerror=()=>{ URL.revokeObjectURL(url); showError(`${file.name}: Video açılamadı`); resolve(); };
+  });
+}
+dropZone.addEventListener('click',()=>fileInput.click());
+$('addBtn').addEventListener('click',e=>{e.stopPropagation();fileInput.click();});
+fileInput.addEventListener('change',()=>{ handleFiles(fileInput.files); fileInput.value=''; });
+['dragenter','dragover'].forEach(ev=>document.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.add('over');}));
+['dragleave','drop'].forEach(ev=>document.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.remove('over');}));
+document.addEventListener('drop',e=>handleFiles(e.dataTransfer.files));
+document.addEventListener('paste',e=>{ const f=e.clipboardData&&e.clipboardData.files; if(f&&f.length) handleFiles(f); });
+
+/* ---------- Kaldır ---------- */
+async function removeItem(item){
+  if(!confirm(`"${item.name}" kaldırılsın mı?`)) return;
+  await dbDelete(item.id);
+  const removed=JSON.parse(localStorage.getItem('ismo-removed')||'[]');
+  if(!removed.includes(item.id)){ removed.push(item.id); localStorage.setItem('ismo-removed',JSON.stringify(removed)); }
+  items=items.filter(i=>i.id!==item.id);
+  if(objectUrls.has(item.id)){ URL.revokeObjectURL(objectUrls.get(item.id)); objectUrls.delete(item.id); }
+  if(currentItem&&currentItem.id===item.id){ zoom.classList.remove('open'); currentItem=null; }
+  await render();
+  if(location.hash.includes(item.id)) $('removedModal').classList.add('open');
+  showToast('Kaldırıldı 🚫');
+}
+$('removedHome').onclick=()=>{ $('removedModal').classList.remove('open'); goPage('home'); };
+
+/* ---------- Vitrine koyma süresi ---------- */
+$('showcaseCancel').onclick=()=>$('showcaseModal').classList.remove('open');
+document.querySelectorAll('[data-showcase]').forEach(b=>b.onclick=async()=>{
+  if(!showcaseTarget) return;
+  const v=b.dataset.showcase;
+  showcaseTarget.featured=true;
+  showcaseTarget.featuredUntil = v==='forever' ? 'forever' : Date.now() + parseInt(v)*DAY;
+  await dbPut(showcaseTarget);
+  $('showcaseModal').classList.remove('open');
+  await render(); showToast('Vitrine koyuldu ⭐');
+});
+$('showcaseRemove').onclick=async()=>{
+  if(!showcaseTarget) return;
+  showcaseTarget.featured=false; delete showcaseTarget.featuredUntil;
+  await dbPut(showcaseTarget);
+  $('showcaseModal').classList.remove('open');
+  await render(); showToast('Vitrinden kaldırıldı');
+};
+
+/* ---------- Kullanıcı banlama ---------- */
+function setPerm(on){
+  permSelected=on;
+  $('permBtn').classList.toggle('selected',on);
+  $('banAmount').disabled=on; $('banUnit').disabled=on;
+}
+function openBan(item){
+  if(!item.uploader || item.uploader==='bilinmiyor'){ showToast('Paylaşan bilinmiyor, banlanamaz'); return; }
+  banTargetItem=item; setPerm(false);
+  $('banTarget').textContent='Kullanıcı: '+item.uploader;
+  $('banReason').value=''; $('banAmount').value=1; $('banUnit').value='day';
+  $('banModal').classList.add('open');
+}
+$('permBtn').onclick=()=>setPerm(!permSelected);
+$('banCancel').onclick=()=>$('banModal').classList.remove('open');
+$('banConfirm').onclick=()=>{
+  if(!banTargetItem) return;
+  const username=banTargetItem.uploader;
+  const reason=$('banReason').value.trim();
+  let durationText, expiresAt=null;
+  if(permSelected){ durationText='PERM'; }
+  else{
+    const amount=Math.max(1,parseInt($('banAmount').value)||1), unit=$('banUnit').value;
+    durationText=`${amount} ${UNIT_LABEL[unit]}`; expiresAt=Date.now()+amount*UNIT_MS[unit];
+  }
+  const bans=getBans().filter(b=>b.usernameLower!==username.toLocaleLowerCase('tr'));
+  bans.push({id:Date.now().toString(36), username, usernameLower:username.toLocaleLowerCase('tr'),
+    deviceId:banTargetItem.uploaderDeviceId||null, reason, durationText, perm:permSelected, expiresAt, createdAt:Date.now()});
+  setBans(bans);
+  $('banModal').classList.remove('open');
+  renderBans(); showToast(username+' banlandı 🚫');
+  const cur=getCurrent(); if(cur) checkBan(cur.name);
+};
+
+/* ---------- Admin Panel (Banlananlar) ---------- */
+const ADMIN_NAME='admin-giris', ADMIN_PASS='flörtleşen ismail';
+let isAdmin=sessionStorage.getItem('ismo-admin')==='1';
+const loginModal=$('loginModal'), adminPanel=$('adminPanel');
+function renderBans(){
+  const list=$('banList'); list.innerHTML='';
+  const bans=activeBans().sort((a,b)=> (b.perm-a.perm) || ((a.expiresAt||Infinity)-(b.expiresAt||Infinity)));
+  bans.forEach(b=>{
+    const row=document.createElement('div'); row.className='ban-row';
+    row.innerHTML=`<div class="ban-info"><b></b><span class="r1"></span><span class="r2"></span></div>`;
+    row.querySelector('b').textContent=b.username;
+    row.querySelector('.r1').textContent=`Süre: ${b.durationText} • ${remainingText(b)}`;
+    row.querySelector('.r2').textContent='Reason: '+(b.reason||'-');
+    const btn=document.createElement('button'); btn.className='unban-btn'; btn.textContent='Unban';
+    btn.onclick=()=>{ setBans(getBans().filter(x=>x.id!==b.id)); renderBans(); showToast(b.username+' banı açıldı ✅'); const c=getCurrent(); if(c) checkBan(c.name); };
+    row.appendChild(btn); list.appendChild(row);
+  });
+  $('banEmpty').style.display=bans.length?'none':'block';
+}
+$('adminBtn').onclick=()=>{ if(isAdmin){ renderBans(); adminPanel.classList.add('open'); } else loginModal.classList.add('open'); };
+$('loginCancel').onclick=()=>loginModal.classList.remove('open');
+$('adminClose').onclick=()=>adminPanel.classList.remove('open');
+function tryAdminLogin(){
+  if($('adminName').value.trim()===ADMIN_NAME && $('adminPass').value===ADMIN_PASS){
+    isAdmin=true; sessionStorage.setItem('ismo-admin','1');
+    $('loginError').style.display='none'; $('adminPass').value='';
+    loginModal.classList.remove('open'); renderBans(); adminPanel.classList.add('open'); render();
+    showToast('Admin girişi yapıldı 😎');
+  } else $('loginError').style.display='block';
+}
+$('loginBtn').onclick=tryAdminLogin;
+$('adminPass').addEventListener('keydown',e=>{ if(e.key==='Enter') tryAdminLogin(); });
+[loginModal,adminPanel,$('showcaseModal'),$('banModal')].forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); }));
+
+/* ---------- Zorunlu Log In / Sign Up ---------- */
+let authMode='login';
+function setAuthMode(m){
+  authMode=m;
+  $('tabLogin').classList.toggle('active',m==='login');
+  $('tabSignup').classList.toggle('active',m==='signup');
+  $('authSubmit').textContent=m==='login'?'Log In':'Sign Up';
+  $('authError').style.display='none';
+}
+$('tabLogin').onclick=()=>setAuthMode('login');
+$('tabSignup').onclick=()=>setAuthMode('signup');
+function authFail(msg){ $('authError').textContent=msg; $('authError').style.display='block'; }
+function enterSite(){
+  $('authGate').classList.remove('open');
+  const cur=getCurrent();
+  $('userChip').textContent=cur?('👤 '+cur.name):'';
+}
+$('authSubmit').onclick=async()=>{
+  const name=$('authName').value.trim(), pass=$('authPass').value;
+  if(!name||!pass) return authFail('İsim ve şifre yaz');
+  if(findBan(name)) return; // ban ekranı açıldı
+  if(authMode==='signup'){
+    if(getAccount()) return authFail('Bu cihazda zaten 1 kere hesap açıldı');
+    const acc={name, pass:await hashText(pass), deviceId, createdAt:Date.now()};
+    localStorage.setItem('ismo-account',JSON.stringify(acc));
+    localStorage.setItem('ismo-current-user',JSON.stringify({name}));
+    enterSite(); showToast('Hesap açıldı ✅');
+  }else{
+    const acc=getAccount();
+    if(!acc) return authFail('Hesap bulunamadı, önce Sign Up yap');
+    if(acc.name.toLocaleLowerCase('tr')!==name.toLocaleLowerCase('tr') || acc.pass!==await hashText(pass))
+      return authFail('İsim veya şifre yanlış');
+    if(findBan(acc.name)) return;
+    localStorage.setItem('ismo-current-user',JSON.stringify({name:acc.name}));
+    enterSite(); showToast('Giriş yapıldı ✅');
+  }
+};
+$('authPass').addEventListener('keydown',e=>{ if(e.key==='Enter') $('authSubmit').click(); });
+
+/* ---------- Başlangıç ---------- */
+(async()=>{
+  items=await dbGetAll();
+  await render(); parseRoute();
+  const cur=getCurrent();
+  if(checkBan(cur?cur.name:'')) { /* ban ekranı */ }
+  else if(cur && getAccount()) enterSite();
+  else $('authGate').classList.add('open');
+  setInterval(()=>{ const c=getCurrent(); if(c) checkBan(c.name); },15000);
+})();
+</script>
+</body>
+</html>
